@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'movie_data.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/content_provider.dart';
+import '../../models/movie_model.dart';
 import '../../widgets/movie_box.dart';
+import '../../widgets/district_cached_image.dart';
 import 'movie_detail_screen.dart';
 
-class MoviesPage extends StatelessWidget {
+class MoviesPage extends ConsumerWidget {
   const MoviesPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final moviesAsync = ref.watch(moviesStreamProvider);
+    final movies = moviesAsync.value ?? [];
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -19,11 +24,11 @@ class MoviesPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildBannerImage('assets/images/spotlight_banner.png'),
-              _buildMovieCarousel(context),
+              if (movies.isNotEmpty) _buildMovieCarousel(context, movies),
               const SizedBox(height: 20),
               _buildBannerImage('assets/images/below-spotlight.png'),
               const SizedBox(height: 20),
-              _buildHorizontalMovieList(screenWidth),
+              if (movies.isNotEmpty) _buildHorizontalMovieList(screenWidth, movies),
               const SizedBox(height: 20),
               _buildBannerImage('assets/images/explore_icon.png'),
               const SizedBox(height: 20),
@@ -43,40 +48,29 @@ class MoviesPage extends StatelessWidget {
               _buildBannerImage('assets/images/only_theatre.png'),
               const SizedBox(height: 20),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final boxWidth = (constraints.maxWidth - 12) / 2;
-                    final gridCount = sampleMovies.length;
-                    return Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: List.generate(gridCount, (index) {
-                        final movie = sampleMovies[index];
-                        return SizedBox(
-                          width: boxWidth,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      MovieDetailScreen(movieData: movie),
-                                ),
-                              );
-                            },
+              if (movies.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final boxWidth = (constraints.maxWidth - 12) / 2;
+                      return Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: List.generate(movies.length, (index) {
+                          final movie = movies[index];
+                          return SizedBox(
+                            width: boxWidth,
                             child: MovieBox(
-                              movieData: movie,
+                              movieData: movie.toMap(),
                               width: boxWidth,
                             ),
-                          ),
-                        );
-                      }),
-                    );
-                  },
+                          );
+                        }),
+                      );
+                    },
+                  ),
                 ),
-              ),
 
               const SizedBox(height: 40),
             ],
@@ -100,9 +94,9 @@ class MoviesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMovieCarousel(BuildContext context) {
+  Widget _buildMovieCarousel(BuildContext context, List<Movie> movies) {
     final PageController controller = PageController(viewportFraction: 0.7);
-    final total = sampleMovies.length;
+    final total = movies.length;
 
     return SizedBox(
       height: 280,
@@ -110,13 +104,13 @@ class MoviesPage extends StatelessWidget {
         controller: controller,
         physics: const BouncingScrollPhysics(),
         itemBuilder: (context, index) {
-          final movie = sampleMovies[index % total];
+          final movie = movies[index % total];
           return GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MovieDetailScreen(movieData: movie),
+                  builder: (context) => MovieDetailScreen(movieData: movie.toMap()),
                 ),
               );
             },
@@ -127,9 +121,9 @@ class MoviesPage extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    /// ✅ FIXED: Local asset instead of network
-                    Image.asset(
-                      movie['bannerImage'] ?? '',
+                    DistrictCachedImage(
+                      imageUrl: movie.bannerUrl,
+                      fallbackAsset: 'assets/movieimg/movies/oppenheimer.jpg',
                       fit: BoxFit.cover,
                     ),
                     Container(
@@ -150,7 +144,7 @@ class MoviesPage extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Text(
-                          movie['title'] ?? '',
+                          movie.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -172,8 +166,8 @@ class MoviesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHorizontalMovieList(double screenWidth) {
-    final movies = sampleMovies.take(3).toList();
+  Widget _buildHorizontalMovieList(double screenWidth, List<Movie> allMovies) {
+    final movies = allMovies.take(3).toList();
 
     return SizedBox(
       height: 230,
@@ -196,7 +190,7 @@ class MoviesPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => MovieDetailScreen(movieData: movie),
+                    builder: (_) => MovieDetailScreen(movieData: movie.toMap()),
                   ),
                 );
               },
@@ -205,17 +199,20 @@ class MoviesPage extends StatelessWidget {
                   ClipRRect(
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: Image.asset(
-                      movie['bannerImage'] ?? '',
+                    child: SizedBox(
                       height: 180,
                       width: double.infinity,
-                      fit: BoxFit.cover,
+                      child: DistrictCachedImage(
+                        imageUrl: movie.bannerUrl,
+                        fallbackAsset: 'assets/movieimg/movies/oppenheimer.jpg',
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      movie['title'] ?? '',
+                      movie.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(

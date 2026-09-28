@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../models/movie_model.dart';
+import '../../widgets/seat_selection_bottom_sheet.dart';
 
 class MovieDetailScreen extends StatefulWidget {
   final Map<String, dynamic> movieData;
@@ -548,39 +550,16 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
+          final movie = Movie.fromMap(widget.movieData);
           showModalBottomSheet(
             context: context,
-            backgroundColor: Colors.black87,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (context) => Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text(
-                    "Work in progress (sorry sir)",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(height: 12),
-                  Text(
-                    "Seat selection feature is under construction.",
-                    style: TextStyle(color: Colors.white60, fontSize: 14),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                ],
-              ),
-            ),
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => SeatSelectionBottomSheet(movie: movie),
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red[600],
+          backgroundColor: const Color(0xFFEF4444),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -597,4 +576,4 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       ),
     );
   }
-}
+}

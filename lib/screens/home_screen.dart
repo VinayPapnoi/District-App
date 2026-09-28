@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart';
 import 'profile_screen.dart';
-import '../providers/auth_provider.dart';
 import '../utils/colors.dart';
 import 'sub_screens/activities_page.dart';
 import 'sub_screens/dining_page.dart';
@@ -286,13 +284,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(_tabs.length, (index) {
                       final isSelected = _selectedTabIndex == index;
-                      final icons = [
-                        FontAwesomeIcons.wandMagicSparkles,
+                      final List<IconData> icons = [
+                        Icons.auto_awesome,
                         Icons.restaurant,
-                        FontAwesomeIcons.guitar,
-                        FontAwesomeIcons.clapperboard,
-                        Icons.shopping_bag,
-                        Icons.local_activity,
+                        Icons.festival_outlined,
+                        Icons.movie_creation_outlined,
+                        Icons.shopping_bag_outlined,
+                        Icons.local_activity_outlined,
                       ];
 
                       return Expanded(

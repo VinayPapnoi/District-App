@@ -1,6 +1,6 @@
-// lib/widgets/movie_box.dart
 import 'package:flutter/material.dart';
 import '../screens/movies/movie_detail_screen.dart';
+import 'district_cached_image.dart';
 
 class MovieBox extends StatelessWidget {
   final Map<String, dynamic> movieData;
@@ -15,7 +15,7 @@ class MovieBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String title = movieData['title'] ?? 'Untitled';
-    final String banner = movieData['bannerImage'] ?? '';
+    final String banner = movieData['bannerUrl'] ?? movieData['bannerImage'] ?? '';
 
     return GestureDetector(
       onTap: () {
@@ -41,26 +41,15 @@ class MovieBox extends StatelessWidget {
             children: [
               AspectRatio(
                 aspectRatio: 3 / 4,
-                child: banner.startsWith('assets/')
-                    ? Image.asset(
-                        banner,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.network(
-                        banner,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          color: Colors.grey[800],
-                          child: const Icon(Icons.broken_image,
-                              color: Colors.white54),
-                        ),
-                      ),
+                child: DistrictCachedImage(
+                  imageUrl: banner,
+                  fallbackAsset: 'assets/movieimg/movies/oppenheimer.jpg',
+                  fit: BoxFit.cover,
+                ),
               ),
-
               Container(
                 color: Colors.black87,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 child: Row(
                   children: [
                     Expanded(
@@ -79,8 +68,11 @@ class MovieBox extends StatelessWidget {
                     IconButton(
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
-                      icon: const Icon(Icons.bookmark_border,
-                          color: Colors.white70, size: 18),
+                      icon: const Icon(
+                        Icons.bookmark_border,
+                        color: Colors.white70,
+                        size: 18,
+                      ),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

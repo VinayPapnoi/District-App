@@ -1,7 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../utils/colors.dart';
 import '../providers/auth_provider.dart';
+import '../repositories/content_repository.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -111,6 +112,23 @@ class ProfileScreen extends ConsumerWidget {
           title: 'About us',
           onTap: () {},
         ),
+        if (kDebugMode) ...[
+          const SizedBox(height: 24),
+          const Text(
+            'Developer & Cloud Settings',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildListTile(
+            icon: Icons.cloud_upload_outlined,
+            title: 'Seed Cloud Firestore (Admin Only)',
+            onTap: () => _handleSeedFirestore(context),
+          ),
+        ],
         const SizedBox(height: 40),
         Center(
           child: Column(
@@ -141,7 +159,7 @@ class ProfileScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Hello, John Doe!',
+          'Hello, Explorer!',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -160,24 +178,86 @@ class ProfileScreen extends ConsumerWidget {
           title: 'My Bookings',
           onTap: () {},
         ),
-        const SizedBox(height: 12),
-        _buildListTile(
-          icon: Icons.payment,
-          title: 'Payment Methods',
-          onTap: () {},
-        ),
-        const SizedBox(height: 12),
+        if (kDebugMode) ...[
+          const SizedBox(height: 24),
+          const Text(
+            'Developer & Cloud Settings',
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildListTile(
+            icon: Icons.cloud_upload_outlined,
+            title: 'Seed Cloud Firestore (Admin Only)',
+            onTap: () => _handleSeedFirestore(context),
+          ),
+        ],
+        const SizedBox(height: 24),
         _buildListTile(
           icon: Icons.logout,
           title: 'Logout',
           onTap: () {
-            // Temporary placeholder logout
             ref.read(authProvider.notifier).logout();
             Navigator.pushReplacementNamed(context, '/login');
           },
         ),
       ],
     );
+  }
+
+  void _handleSeedFirestore(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const Center(
+        child: Card(
+          color: Color(0xFF1E1E28),
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Color(0xFF6366F1)),
+                SizedBox(height: 16),
+                Text(
+                  'Seeding Cloud Firestore...',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final repository = ContentRepository();
+      final results = await repository.seedFirestoreDatabase(overwrite: true);
+      if (context.mounted) {
+        Navigator.pop(context); // close progress dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: const Color(0xFF10B981),
+            content: Text(
+              '✅ Successfully seeded ${results['movies']} movies, ${results['events']} events, ${results['restaurants']} restaurants into Cloud Firestore!',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // close progress dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.redAccent,
+            content: Text('❌ Error seeding Firestore: $e'),
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildListTile({
@@ -225,3 +305,4 @@ class ProfileScreen extends ConsumerWidget {
     );
   }
 }
+

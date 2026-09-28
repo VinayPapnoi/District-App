@@ -365,23 +365,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Work in progress (Sorry Sir)'),
-              backgroundColor: Color(0xFF6366F1),
-            ),
-          );
-        },
+        onPressed: () => _showEventBookingSheet(context),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.red[600],
+          backgroundColor: const Color(0xFF6366F1),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: const Text(
-          'Book Now',
+          'Book Tickets',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -391,4 +384,177 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       ),
     );
   }
-}
+
+  void _showEventBookingSheet(BuildContext context) {
+    int ticketCount = 2;
+    String ticketType = 'General Entry';
+    final int pricePerTicket = (widget.eventData['basePrice'] is num)
+        ? (widget.eventData['basePrice'] as num).toInt()
+        : 1499;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          final int multiplier = ticketType == 'VIP Access' ? 2 : 1;
+          final int total = ticketCount * pricePerTicket * multiplier;
+
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              color: Color(0xFF13131A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade700,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.eventData['title'] ?? 'Event Booking',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.eventData['venue'] ?? '',
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                ),
+                const SizedBox(height: 20),
+
+                // Pass Type
+                const Text(
+                  'Select Pass Type',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: ['General Entry', 'VIP Access'].map((type) {
+                    final isSel = ticketType == type;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: ChoiceChip(
+                        label: Text(type),
+                        selected: isSel,
+                        selectedColor: const Color(0xFF6366F1),
+                        backgroundColor: const Color(0xFF22222E),
+                        labelStyle: TextStyle(
+                          color: isSel ? Colors.white : Colors.grey.shade400,
+                        ),
+                        onSelected: (val) {
+                          if (val) setSheetState(() => ticketType = type);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Quantity selector
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Number of Passes',
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline, color: Colors.white70),
+                          onPressed: ticketCount > 1
+                              ? () => setSheetState(() => ticketCount--)
+                              : null,
+                        ),
+                        Text(
+                          '$ticketCount',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline, color: Colors.white70),
+                          onPressed: ticketCount < 10
+                              ? () => setSheetState(() => ticketCount++)
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const Divider(color: Color(0xFF262636)),
+                const SizedBox(height: 12),
+
+                // Total and Pay
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Total Amount', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        Text(
+                          '₹$total',
+                          style: const TextStyle(
+                            color: Color(0xFF10B981),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        final refCode = 'EVT-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: const Color(0xFF10B981),
+                            content: Text(
+                              '🎉 $ticketCount passes confirmed! Booking Ref: $refCode',
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6366F1),
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Confirm Booking',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/district_cached_image.dart';
 
 class DiningDetailScreen extends StatefulWidget {
   final Map<String, dynamic> restaurantData;
@@ -560,14 +561,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
         children: [
           Expanded(
             child: OutlinedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Opening table booking...'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              },
+              onPressed: () => _showTableBookingSheet(context),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.white),
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -588,14 +582,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
           const SizedBox(width: 12),
           Expanded(
             child: ElevatedButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Processing bill payment...'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              },
+              onPressed: () => _showPayBillSheet(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -618,8 +605,278 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
     );
   }
 
+  void _showTableBookingSheet(BuildContext context) {
+    int guests = 2;
+    String selectedSlot = '7:30 PM (Dinner)';
+    final List<String> slots = [
+      '1:00 PM (Lunch)',
+      '1:45 PM (Lunch)',
+      '7:30 PM (Dinner)',
+      '8:30 PM (Dinner)',
+      '9:15 PM (Dinner)',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: const BoxDecoration(
+              color: Color(0xFF13131A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade700,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Reserve a Table at ${widget.restaurantData['name'] ?? 'Restaurant'}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.restaurantData['location'] ?? '',
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                ),
+                const SizedBox(height: 20),
+
+                // Number of guests
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Guests',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline, color: Colors.white70),
+                          onPressed: guests > 1
+                              ? () => setSheetState(() => guests--)
+                              : null,
+                        ),
+                        Text(
+                          '$guests People',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline, color: Colors.white70),
+                          onPressed: guests < 12
+                              ? () => setSheetState(() => guests++)
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Time Slots
+                const Text(
+                  'Select Time Slot',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: slots.map((slot) {
+                    final isSel = selectedSlot == slot;
+                    return ChoiceChip(
+                      label: Text(slot),
+                      selected: isSel,
+                      selectedColor: const Color(0xFFEF4444),
+                      backgroundColor: const Color(0xFF22222E),
+                      labelStyle: TextStyle(
+                        color: isSel ? Colors.white : Colors.grey.shade400,
+                        fontSize: 12,
+                      ),
+                      onSelected: (val) {
+                        if (val) setSheetState(() => selectedSlot = slot);
+                      },
+                    );
+                  }).toList(),
+                ),
+
+                const Divider(color: Color(0xFF262636)),
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      final refCode = 'TBL-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: const Color(0xFF10B981),
+                          content: Text(
+                            '🎉 Table for $guests confirmed ($selectedSlot)! Ref: $refCode',
+                          ),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFEF4444),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      'Confirm Reservation',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showPayBillSheet(BuildContext context) {
+    final TextEditingController amountController =
+        TextEditingController(text: '1200');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Color(0xFF13131A),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade700,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Pay Dining Bill at ${widget.restaurantData['name'] ?? ''}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+                decoration: InputDecoration(
+                  prefixText: '₹ ',
+                  prefixStyle: const TextStyle(color: Color(0xFF10B981), fontSize: 18),
+                  labelText: 'Enter Bill Amount',
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color(0xFF22222E),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: const Color(0xFF10B981),
+                        content: Text(
+                          '✅ Bill payment of ₹${amountController.text} processed successfully with 10% instant discount applied!',
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Proceed to Pay with Discount',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showGallery() {
-    final gallery = widget.restaurantData['gallery'] as List;
+    final gallery = (widget.restaurantData['galleryUrls'] ??
+        widget.restaurantData['gallery'] ??
+        []) as List;
+
+    if (gallery.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No gallery photos available.')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -629,8 +886,9 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
           child: PageView.builder(
             itemCount: gallery.length,
             itemBuilder: (context, index) {
-              return Image.asset(
-                gallery[index],
+              return DistrictCachedImage(
+                imageUrl: gallery[index].toString(),
+                fallbackAsset: 'assets/images/food.jpg',
                 fit: BoxFit.contain,
               );
             },
@@ -639,4 +897,4 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
       ),
     );
   }
-}
+}
