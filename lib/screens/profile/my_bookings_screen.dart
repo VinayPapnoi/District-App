@@ -144,9 +144,18 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
   Widget _buildDigitalTicket(Booking booking) {
     final bool isMovie = booking.itemType == 'movie';
     final bool isDining = booking.itemType == 'dining';
+    final bool isActivity = booking.itemType == 'activity';
     final Color badgeColor = isMovie
         ? const Color(0xFF6366F1)
-        : (isDining ? const Color(0xFFEF4444) : const Color(0xFFF59E0B));
+        : (isDining
+            ? const Color(0xFFEF4444)
+            : (isActivity ? const Color(0xFF10B981) : const Color(0xFFF59E0B)));
+
+    final String fallback = isMovie
+        ? 'assets/movieimg/movies/banner1.jpg'
+        : (isDining
+            ? 'assets/images/masala-synergy.jpeg'
+            : (isActivity ? 'assets/images/sports.jpg' : 'assets/images/messi_event.jpg'));
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -177,7 +186,7 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
                     height: 85,
                     child: DistrictCachedImage(
                       imageUrl: booking.imageUrl,
-                      fallbackAsset: 'assets/movieimg/movies/banner1.jpg',
+                      fallbackAsset: fallback,
                       fit: BoxFit.cover,
                     ),
                   ),
