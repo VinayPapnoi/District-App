@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/favorites_provider.dart';
 import '../../models/movie_model.dart';
 import '../../widgets/seat_selection_bottom_sheet.dart';
 
@@ -68,14 +70,30 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 icon: const Icon(Icons.search, color: Colors.white),
                 onPressed: () {},
               ),
-              IconButton(
-                icon: const Icon(Icons.bookmark_border, color: Colors.white),
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Colors.black87,
-                      content: Text('"${data['title']}" added to watchlist'),
+              Consumer(
+                builder: (context, ref, _) {
+                  final movieId = data['id']?.toString() ?? '';
+                  final isFav = ref.watch(favoritesProvider).contains(movieId);
+                  return IconButton(
+                    icon: Icon(
+                      isFav ? Icons.bookmark : Icons.bookmark_border,
+                      color: isFav ? const Color(0xFFF59E0B) : Colors.white,
                     ),
+                    onPressed: () {
+                      ref.read(favoritesProvider.notifier).toggleFavorite(movieId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: const Color(0xFF1E1E28),
+                          duration: const Duration(seconds: 2),
+                          content: Text(
+                            isFav
+                                ? 'Removed "${data['title']}" from Watchlist'
+                                : 'Added "${data['title']}" to Watchlist ⭐',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

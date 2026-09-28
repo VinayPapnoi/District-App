@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/favorites_provider.dart';
 import '../../widgets/district_cached_image.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -36,6 +38,32 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
+              Consumer(
+                builder: (context, ref, _) {
+                  final String eventId = widget.eventData['id']?.toString() ?? '';
+                  final String eventTitle = widget.eventData['title'] ?? 'Event';
+                  final isFav = ref.watch(favoritesProvider).contains(eventId);
+                  return IconButton(
+                    icon: Icon(
+                      isFav ? Icons.bookmark : Icons.bookmark_border,
+                      color: isFav ? const Color(0xFFF59E0B) : Colors.white,
+                    ),
+                    onPressed: () {
+                      ref.read(favoritesProvider.notifier).toggleFavorite(eventId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: const Color(0xFF1E1E28),
+                          duration: const Duration(seconds: 2),
+                          content: Text(
+                            isFav ? 'Removed "$eventTitle" from Saved Plans' : 'Saved "$eventTitle" to Plans ❤️',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               IconButton(
                 icon: const Icon(Icons.share, color: Colors.white),
                 onPressed: () {},

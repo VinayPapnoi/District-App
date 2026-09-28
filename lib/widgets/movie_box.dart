@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/favorites_provider.dart';
 import '../screens/movies/movie_detail_screen.dart';
 import 'district_cached_image.dart';
 
@@ -65,20 +67,21 @@ class MovieBox extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      icon: const Icon(
-                        Icons.bookmark_border,
-                        color: Colors.white70,
-                        size: 18,
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.black87,
-                            content: Text('"$title" added to watchlist'),
+                    Consumer(
+                      builder: (context, ref, _) {
+                        final String id = movieData['id']?.toString() ?? '';
+                        final isFav = ref.watch(favoritesProvider).contains(id);
+                        return IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: Icon(
+                            isFav ? Icons.bookmark : Icons.bookmark_border,
+                            color: isFav ? const Color(0xFFF59E0B) : Colors.white70,
+                            size: 18,
                           ),
+                          onPressed: () {
+                            ref.read(favoritesProvider.notifier).toggleFavorite(id);
+                          },
                         );
                       },
                     ),

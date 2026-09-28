@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/favorites_provider.dart';
 import '../../widgets/district_cached_image.dart';
 
 class DiningDetailScreen extends StatefulWidget {
@@ -37,6 +39,12 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    final String restaurantId = widget.restaurantData['id']?.toString() ?? '';
+    final String restaurantName = widget.restaurantData['name'] ?? widget.restaurantData['title'] ?? 'Restaurant';
+    final String imageUrl = widget.restaurantData['imageUrl']?.toString() ??
+        widget.restaurantData['image']?.toString() ??
+        '';
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: CustomScrollView(
@@ -51,9 +59,29 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
               onPressed: () => Navigator.pop(context),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.bookmark_border, color: Colors.white),
-                onPressed: () {},
+              Consumer(
+                builder: (context, ref, _) {
+                  final isFav = ref.watch(favoritesProvider).contains(restaurantId);
+                  return IconButton(
+                    icon: Icon(
+                      isFav ? Icons.bookmark : Icons.bookmark_border,
+                      color: isFav ? const Color(0xFFF59E0B) : Colors.white,
+                    ),
+                    onPressed: () {
+                      ref.read(favoritesProvider.notifier).toggleFavorite(restaurantId);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: const Color(0xFF1E1E28),
+                          duration: const Duration(seconds: 2),
+                          content: Text(
+                            isFav ? 'Removed "$restaurantName" from Saved Plans' : 'Saved "$restaurantName" to Plans ❤️',
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
               ),
               IconButton(
                 icon: const Icon(Icons.share, color: Colors.white),
@@ -64,11 +92,10 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    widget.restaurantData['image'],
+                  DistrictCachedImage(
+                    imageUrl: imageUrl,
+                    fallbackAsset: 'assets/images/masala-synergy.jpeg',
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(color: Colors.grey[900]),
                   ),
                   // View Gallery Button
                   Positioned(
