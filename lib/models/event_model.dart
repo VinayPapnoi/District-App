@@ -60,6 +60,7 @@ class EventModel {
       'id': id,
       'title': title,
       'imageUrl': imageUrl,
+      'image': imageUrl,
       'dateTime': dateTime,
       'venue': venue,
       'language': language,

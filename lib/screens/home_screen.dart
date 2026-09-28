@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:location/location.dart' as loc;
 import 'package:geocoding/geocoding.dart';
 import 'profile_screen.dart';
+import '../providers/content_provider.dart';
 import '../utils/colors.dart';
 import 'sub_screens/activities_page.dart';
 import 'sub_screens/dining_page.dart';
@@ -20,6 +21,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedTabIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
 
   String _city = "Loading...";
   String _country = "";
@@ -64,6 +66,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _getUserLocation();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _getUserLocation() async {
@@ -254,7 +262,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: TextField(
+                      controller: _searchController,
                       style: const TextStyle(color: Colors.white),
+                      onChanged: (val) {
+                        ref.read(searchQueryProvider.notifier).state = val;
+                        setState(() {});
+                      },
                       decoration: InputDecoration(
                         hintText: _searchHints[_selectedTabIndex],
                         hintStyle: TextStyle(
@@ -265,6 +278,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           Icons.search,
                           color: Colors.grey.shade500,
                         ),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.clear,
+                                  color: Colors.grey,
+                                  size: 18,
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  ref.read(searchQueryProvider.notifier).state = '';
+                                  setState(() {});
+                                },
+                              )
+                            : null,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,

@@ -93,6 +93,7 @@ class Movie {
       'id': id,
       'title': title,
       'bannerUrl': bannerUrl,
+      'bannerImage': bannerUrl,
       'certificate': certificate,
       'language': language,
       'duration': duration,

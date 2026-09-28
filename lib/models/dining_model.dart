@@ -106,7 +106,9 @@ class Restaurant {
     return {
       'id': id,
       'name': name,
+      'title': name,
       'imageUrl': imageUrl,
+      'image': imageUrl,
       'galleryUrls': galleryUrls,
       'rating': rating,
       'totalRatings': totalRatings,

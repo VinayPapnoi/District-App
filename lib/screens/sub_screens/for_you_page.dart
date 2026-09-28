@@ -15,6 +15,11 @@ class ForYouPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider).trim();
+    final filteredMovies = ref.watch(filteredMoviesProvider);
+    final filteredEvents = ref.watch(filteredEventsProvider);
+    final filteredRestaurants = ref.watch(filteredRestaurantsProvider);
+
     final moviesAsync = ref.watch(moviesStreamProvider);
     final eventsAsync = ref.watch(eventsStreamProvider);
     final restaurantsAsync = ref.watch(restaurantsStreamProvider);
@@ -22,6 +27,21 @@ class ForYouPage extends ConsumerWidget {
     final movies = moviesAsync.value ?? [];
     final events = eventsAsync.value ?? [];
     final restaurants = restaurantsAsync.value ?? [];
+
+    if (searchQuery.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: _buildSearchResults(
+            context,
+            searchQuery,
+            filteredMovies,
+            filteredEvents,
+            filteredRestaurants,
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -295,6 +315,258 @@ class ForYouPage extends ConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(
+    BuildContext context,
+    String query,
+    List<Movie> movies,
+    List<EventModel> events,
+    List<Restaurant> restaurants,
+  ) {
+    final bool isEmpty = movies.isEmpty && events.isEmpty && restaurants.isEmpty;
+
+    if (isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.search_off_outlined,
+                size: 64,
+                color: Colors.grey.shade700,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No results found for "$query"',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try searching with a different keyword across movies, events, or dining.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Explore results for "$query"',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Matching Movies
+          if (movies.isNotEmpty) ...[
+            _buildSectionHeader('MOVIES (${movies.length})'),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 230,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: movies.length,
+                itemBuilder: (context, index) {
+                  final movie = movies[index];
+                  return Container(
+                    width: 140,
+                    margin: const EdgeInsets.only(right: 12),
+                    child: MovieBox(
+                      movieData: movie.toMap(),
+                      width: 140,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          // Matching Events
+          if (events.isNotEmpty) ...[
+            _buildSectionHeader('EVENTS (${events.length})'),
+            const SizedBox(height: 12),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: events.length,
+              itemBuilder: (context, index) {
+                final event = events[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EventDetailScreen(eventData: event.toMap()),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
+                          child: SizedBox(
+                            width: 90,
+                            height: 90,
+                            child: DistrictCachedImage(
+                              imageUrl: event.imageUrl,
+                              fallbackAsset: 'assets/images/messi_event.jpg',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                event.title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                event.venue,
+                                style: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
+
+          // Matching Restaurants
+          if (restaurants.isNotEmpty) ...[
+            _buildSectionHeader('DINING & RESTAURANTS (${restaurants.length})'),
+            const SizedBox(height: 12),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: restaurants.length,
+              itemBuilder: (context, index) {
+                final restaurant = restaurants[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A1A1A),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DiningDetailScreen(restaurantData: restaurant.toMap()),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
+                          child: SizedBox(
+                            width: 90,
+                            height: 90,
+                            child: DistrictCachedImage(
+                              imageUrl: restaurant.imageUrl,
+                              fallbackAsset: 'assets/images/masala-synergy.jpeg',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                restaurant.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${restaurant.cuisine} • ${restaurant.location}',
+                                style: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.amberAccent,
+        fontSize: 12,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 1.2,
       ),
     );
   }

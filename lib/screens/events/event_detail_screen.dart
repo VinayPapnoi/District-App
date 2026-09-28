@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../widgets/district_cached_image.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -17,6 +18,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = widget.eventData['imageUrl']?.toString() ??
+        widget.eventData['image']?.toString() ??
+        '';
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: CustomScrollView(
@@ -40,11 +45,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.asset(
-                    widget.eventData['image'],
+                  DistrictCachedImage(
+                    imageUrl: imageUrl,
+                    fallbackAsset: 'assets/images/messi_event.jpg',
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) =>
-                        Container(color: Colors.grey[900]),
                   ),
                   // Gradient overlay
                   Container(
@@ -164,7 +168,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   Widget _buildCategoryTags() {
-    final categories = widget.eventData['categories'] as List<String>? ?? [];
+    final categories = (widget.eventData['categories'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
     
     return Wrap(
       spacing: 8,

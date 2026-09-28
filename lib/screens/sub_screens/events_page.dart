@@ -26,8 +26,19 @@ class EventsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final searchQuery = ref.watch(searchQueryProvider).trim();
+    final filteredEvents = ref.watch(filteredEventsProvider);
     final eventsAsync = ref.watch(eventsStreamProvider);
     final events = eventsAsync.value ?? [];
+
+    if (searchQuery.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: const Color.fromARGB(255, 18, 15, 23),
+        body: SafeArea(
+          child: _buildSearchResults(context, searchQuery, filteredEvents),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 18, 15, 23),
@@ -277,6 +288,175 @@ class EventsPage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(
+    BuildContext context,
+    String query,
+    List<dynamic> results,
+  ) {
+    if (results.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.festival_outlined,
+                size: 64,
+                color: Colors.grey.shade700,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No events found for "$query"',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try searching by event name, venue, or artist.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Events for "$query"',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amberAccent.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${results.length}',
+                  style: const TextStyle(
+                    color: Colors.amberAccent,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: results.length,
+            itemBuilder: (context, index) {
+              final event = results[index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A1A1A),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EventDetailScreen(
+                          eventData: event.toMap(),
+                        ),
+                      ),
+                    );
+                  },
+                  child: Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(16),
+                        ),
+                        child: SizedBox(
+                          width: 110,
+                          height: 110,
+                          child: DistrictCachedImage(
+                            imageUrl: event.imageUrl,
+                            fallbackAsset: 'assets/images/messi_event.jpg',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                event.venue,
+                                style: const TextStyle(
+                                  color: Colors.purpleAccent,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                event.title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                event.dateTime,
+                                style: TextStyle(
+                                  color: Colors.grey.shade400,
+                                  fontSize: 12,
+                                ),
+                                maxLines: 1,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

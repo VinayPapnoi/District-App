@@ -26,8 +26,19 @@ class _DiningPageState extends ConsumerState<DiningPage> {
 
   @override
   Widget build(BuildContext context) {
+    final searchQuery = ref.watch(searchQueryProvider).trim();
+    final searchFilteredRestaurants = ref.watch(filteredRestaurantsProvider);
     final restaurantsAsync = ref.watch(restaurantsStreamProvider);
     final allRestaurants = restaurantsAsync.value ?? [];
+
+    if (searchQuery.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: _buildSearchResults(context, searchQuery, searchFilteredRestaurants),
+        ),
+      );
+    }
 
     final filteredRestaurants = _selectedCategory == 'All'
         ? allRestaurants
@@ -428,6 +439,96 @@ class _DiningPageState extends ConsumerState<DiningPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(
+    BuildContext context,
+    String query,
+    List<Restaurant> results,
+  ) {
+    if (results.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.restaurant_outlined,
+                size: 64,
+                color: Colors.grey.shade700,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No restaurants found for "$query"',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try searching by cuisine (e.g. Italian, Japanese) or location.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Restaurants for "$query"',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${results.length}',
+                  style: const TextStyle(
+                    color: Color(0xFFEF4444),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: results.length,
+            itemBuilder: (context, index) {
+              return _buildRestaurantCard(results[index]);
+            },
+          ),
+        ],
       ),
     );
   }

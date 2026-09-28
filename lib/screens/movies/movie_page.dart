@@ -12,8 +12,19 @@ class MoviesPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final searchQuery = ref.watch(searchQueryProvider).trim();
+    final filteredMovies = ref.watch(filteredMoviesProvider);
     final moviesAsync = ref.watch(moviesStreamProvider);
     final movies = moviesAsync.value ?? [];
+
+    if (searchQuery.isNotEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: SafeArea(
+          child: _buildSearchResults(context, searchQuery, filteredMovies),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -228,6 +239,103 @@ class MoviesPage extends ConsumerWidget {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildSearchResults(
+    BuildContext context,
+    String query,
+    List<Movie> results,
+  ) {
+    if (results.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.movie_filter_outlined,
+                size: 64,
+                color: Colors.grey.shade700,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'No movies found for "$query"',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try searching by full title, language, or genre.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey.shade500,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Results for "$query"',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${results.length}',
+                  style: const TextStyle(
+                    color: Color(0xFF6366F1),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final boxWidth = (constraints.maxWidth - 12) / 2;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 16,
+                children: results.map((movie) {
+                  return MovieBox(
+                    movieData: movie.toMap(),
+                    width: boxWidth,
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
