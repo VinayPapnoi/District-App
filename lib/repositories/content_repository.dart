@@ -119,10 +119,10 @@ class ContentRepository {
   // ---------------------------------------------------------------------------
 
   Stream<List<Booking>> streamUserBookings(String userId) {
-    if (userId.isEmpty) return Stream.value([]);
+    final effectiveUid = userId.trim().isEmpty ? 'guest_user' : userId.trim();
     return _firestore
         .collection('users')
-        .doc(userId)
+        .doc(effectiveUid)
         .collection('bookings')
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -132,13 +132,81 @@ class ContentRepository {
   }
 
   Future<void> saveBooking(Booking booking) async {
-    if (booking.userId.isEmpty) return;
+    final effectiveUid =
+        booking.userId.trim().isEmpty ? 'guest_user' : booking.userId.trim();
     await _firestore
         .collection('users')
-        .doc(booking.userId)
+        .doc(effectiveUid)
         .collection('bookings')
         .doc(booking.id)
         .set(booking.toMap());
+  }
+
+  // ---------------------------------------------------------------------------
+  // Movie Booked Seats (Real-time synchronization per movie and showtime)
+  // ---------------------------------------------------------------------------
+
+  Stream<Map<String, List<String>>> streamMovieBookedSeats(String movieId) {
+    return _firestore
+        .collection('movies')
+        .doc(movieId)
+        .snapshots()
+        .map((snapshot) {
+      if (!snapshot.exists) return <String, List<String>>{};
+      final data = snapshot.data();
+      if (data == null || data['bookedSeats'] == null) {
+        return <String, List<String>>{};
+      }
+      final rawMap = data['bookedSeats'] as Map<dynamic, dynamic>;
+      final result = <String, List<String>>{};
+      rawMap.forEach((key, val) {
+        if (val is List) {
+          result[key.toString()] = val.map((e) => e.toString()).toList();
+        }
+      });
+      return result;
+    }).handleError((_) => <String, List<String>>{});
+  }
+
+  Future<void> bookMovieSeats({
+    required String movieId,
+    required String showtime,
+    required List<String> seats,
+  }) async {
+    final docRef = _firestore.collection('movies').doc(movieId);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) {
+        transaction.set(
+          docRef,
+          {
+            'bookedSeats': {
+              showtime: seats,
+            }
+          },
+          SetOptions(merge: true),
+        );
+        return;
+      }
+
+      final data = snapshot.data();
+      final bookedSeatsMap = Map<String, dynamic>.from(
+          data?['bookedSeats'] as Map? ?? {});
+      final currentShowtimeSeats = List<String>.from(
+          bookedSeatsMap[showtime] as List? ?? []);
+
+      // Check for seat booking conflicts
+      final alreadyTaken = seats.where((s) => currentShowtimeSeats.contains(s)).toList();
+      if (alreadyTaken.isNotEmpty) {
+        throw Exception('Seat(s) ${alreadyTaken.join(', ')} have already been booked by another user!');
+      }
+
+      // Add new seats
+      final updatedSeats = {...currentShowtimeSeats, ...seats}.toList();
+      bookedSeatsMap[showtime] = updatedSeats;
+
+      transaction.update(docRef, {'bookedSeats': bookedSeatsMap});
+    });
   }
 
   // ---------------------------------------------------------------------------

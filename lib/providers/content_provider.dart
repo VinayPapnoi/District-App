@@ -34,6 +34,13 @@ final userBookingsProvider = StreamProvider<List<Booking>>((ref) {
   return repository.streamUserBookings(userId);
 });
 
+// Real-time Movie Booked Seats Provider per Movie ID
+final movieBookedSeatsProvider =
+    StreamProvider.family<Map<String, List<String>>, String>((ref, movieId) {
+  final repository = ref.watch(contentRepositoryProvider);
+  return repository.streamMovieBookedSeats(movieId);
+});
+
 // Search Query State Provider
 final searchQueryProvider = StateProvider<String>((ref) => '');
 

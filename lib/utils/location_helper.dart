@@ -1,8 +1,6 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
-String _isoCountryCode = "";
-
 class LocationHelper {
   /// Returns a map with city and country using GPS
   static Future<Map<String, String>> getCurrentCityAndCountry() async {
@@ -35,7 +33,6 @@ class LocationHelper {
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
-        _isoCountryCode = place.isoCountryCode ?? "";
         return {
           'city': place.locality ?? 'Unknown',
           'country': place.country ?? ''

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../repositories/content_repository.dart';
 import 'profile/saved_plans_screen.dart';
+import 'profile/my_bookings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -78,6 +79,17 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 24),
+        _buildListTile(
+          icon: Icons.confirmation_number_outlined,
+          title: 'My Bookings & Tickets',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+            );
+          },
+        ),
+        const SizedBox(height: 12),
         _buildListTile(
           icon: Icons.bookmark_outline,
           title: 'My Saved Plans',
@@ -186,9 +198,14 @@ class ProfileScreen extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         _buildListTile(
-          icon: Icons.history,
-          title: 'My Bookings',
-          onTap: () {},
+          icon: Icons.confirmation_number_outlined,
+          title: 'My Bookings & Tickets',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+            );
+          },
         ),
         const SizedBox(height: 12),
         _buildListTile(

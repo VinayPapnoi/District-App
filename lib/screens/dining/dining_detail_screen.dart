@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/booking_model.dart';
+import '../../repositories/content_repository.dart';
 import '../../providers/favorites_provider.dart';
 import '../../widgets/district_cached_image.dart';
 
@@ -758,17 +760,42 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       Navigator.pop(ctx);
-                      final refCode = 'TBL-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: const Color(0xFF10B981),
-                          content: Text(
-                            '🎉 Table for $guests confirmed ($selectedSlot)! Ref: $refCode',
-                          ),
-                        ),
+                      final refCode =
+                          'TBL-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+                      final booking = Booking(
+                        id: 'booking_${DateTime.now().millisecondsSinceEpoch}',
+                        userId: 'guest_user',
+                        itemTitle: widget.restaurantData['name'] ??
+                            widget.restaurantData['title'] ??
+                            'Restaurant',
+                        itemType: 'dining',
+                        imageUrl:
+                            widget.restaurantData['imageUrl']?.toString() ??
+                                widget.restaurantData['image']?.toString() ??
+                                '',
+                        date: 'Today',
+                        time: selectedSlot,
+                        details: 'Table for $guests guests ($selectedSlot)',
+                        totalPrice: 0,
+                        bookingReference: refCode,
+                        createdAt: DateTime.now(),
                       );
+
+                      await ContentRepository().saveBooking(booking);
+
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: const Color(0xFF10B981),
+                            content: Text(
+                              '🎉 Table for $guests confirmed ($selectedSlot)! Ref: $refCode',
+                            ),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFEF4444),

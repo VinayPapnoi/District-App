@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../models/booking_model.dart';
+import '../../repositories/content_repository.dart';
 import '../../providers/favorites_provider.dart';
 import '../../widgets/district_cached_image.dart';
 
@@ -558,17 +560,41 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pop(ctx);
-                        final refCode = 'EVT-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: const Color(0xFF10B981),
-                            content: Text(
-                              '🎉 $ticketCount passes confirmed! Booking Ref: $refCode',
-                            ),
-                          ),
+                        final refCode =
+                            'EVT-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+                        final booking = Booking(
+                          id: 'booking_${DateTime.now().millisecondsSinceEpoch}',
+                          userId: 'guest_user',
+                          itemTitle:
+                              widget.eventData['title']?.toString() ?? 'Event',
+                          itemType: 'event',
+                          imageUrl: widget.eventData['imageUrl']?.toString() ??
+                              widget.eventData['image']?.toString() ??
+                              '',
+                          date:
+                              widget.eventData['dateTime']?.toString() ?? 'Upcoming',
+                          time: 'Evening',
+                          details: '$ticketType x $ticketCount',
+                          totalPrice: total,
+                          bookingReference: refCode,
+                          createdAt: DateTime.now(),
                         );
+
+                        await ContentRepository().saveBooking(booking);
+
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: const Color(0xFF10B981),
+                              content: Text(
+                                '🎉 $ticketCount passes confirmed! Booking Ref: $refCode',
+                              ),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF6366F1),
