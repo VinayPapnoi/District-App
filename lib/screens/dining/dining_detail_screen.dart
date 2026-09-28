@@ -180,7 +180,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                             child: Row(
                               children: [
                                 Text(
-                                  widget.restaurantData['rating'].toString(),
+                                  (widget.restaurantData['rating'] ?? 4.5).toString(),
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -198,7 +198,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${widget.restaurantData['totalRatings']}',
+                            '${widget.restaurantData['totalRatings'] ?? 100}',
                             style: TextStyle(
                               color: Colors.grey[400],
                               fontSize: 14,
@@ -208,7 +208,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        widget.restaurantData['cuisine'],
+                        widget.restaurantData['cuisine']?.toString() ?? 'Multi-Cuisine',
                         style: TextStyle(
                           color: Colors.grey[400],
                           fontSize: 14,
@@ -216,7 +216,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        widget.restaurantData['location'],
+                        widget.restaurantData['location']?.toString() ?? 'Downtown',
                         style: TextStyle(
                           color: Colors.grey[400],
                           fontSize: 14,
@@ -229,7 +229,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                               color: Colors.grey[400], size: 16),
                           const SizedBox(width: 4),
                           Text(
-                            widget.restaurantData['timings'],
+                            widget.restaurantData['timings']?.toString() ?? 'Open • Timings vary',
                             style: TextStyle(
                               color: Colors.grey[400],
                               fontSize: 14,
@@ -251,7 +251,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                     children: [
                       _buildQuickInfo(
                         icon: Icons.location_on,
-                        label: widget.restaurantData['distance'],
+                        label: widget.restaurantData['distance']?.toString() ?? 'Nearby',
                       ),
                       _buildQuickInfo(
                         icon: Icons.access_time,
@@ -259,7 +259,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                       ),
                       _buildQuickInfo(
                         icon: Icons.currency_rupee,
-                        label: widget.restaurantData['priceForTwo'],
+                        label: widget.restaurantData['priceForTwo']?.toString() ?? '₹1,000 for two',
                       ),
                     ],
                   ),
@@ -331,7 +331,27 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
   }
 
   Widget _buildOffersTab() {
-    final offers = widget.restaurantData['offers'] as List;
+    final rawOffers = widget.restaurantData['offers'];
+    final offers = (rawOffers is List) ? rawOffers : [];
+
+    if (offers.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Center(
+            child: Text(
+              'No active offers available at this time',
+              style: TextStyle(color: Colors.grey, fontSize: 14),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -347,7 +367,10 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
             ),
           ),
           const SizedBox(height: 16),
-          ...offers.map((offer) => _buildOfferCard(offer)).toList(),
+          ...offers.map((offer) {
+            final offerMap = offer is Map ? Map<String, dynamic>.from(offer) : <String, dynamic>{};
+            return _buildOfferCard(offerMap);
+          }).toList(),
         ],
       ),
     );
@@ -376,7 +399,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                 const Icon(Icons.celebration, color: Colors.purple, size: 20),
                 const SizedBox(width: 8),
                 Text(
-                  offer['title'],
+                  offer['title']?.toString() ?? 'Special Offer',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -387,7 +410,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
             )
           else
             Text(
-              offer['title'],
+              offer['title']?.toString() ?? 'Special Offer',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -397,7 +420,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
           const SizedBox(height: 8),
           if (offer['validFrom'] != null)
             Text(
-              offer['validFrom'],
+              offer['validFrom'].toString(),
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 12,
@@ -405,7 +428,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
             ),
           if (offer['description'] != null)
             Text(
-              offer['description'],
+              offer['description'].toString(),
               style: TextStyle(
                 color: Colors.grey[300],
                 fontSize: 14,
@@ -413,7 +436,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
             ),
           if (offer['details'] != null)
             Text(
-              offer['details'],
+              offer['details'].toString(),
               style: TextStyle(
                 color: Colors.grey[300],
                 fontSize: 14,
@@ -422,17 +445,16 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
           if (offer['buttonText'] != null) ...[
             const SizedBox(height: 12),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () => _showTableBookingSheet(context),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                side: const BorderSide(color: Colors.white),
+                backgroundColor: const Color(0xFF6366F1),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: Text(
-                offer['buttonText'],
-                style: const TextStyle(color: Colors.white),
+                offer['buttonText'].toString(),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -466,7 +488,7 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            widget.restaurantData['menuUpdated'],
+            widget.restaurantData['menuUpdated']?.toString() ?? 'Updated recently',
             style: TextStyle(
               color: Colors.grey[400],
               fontSize: 12,
@@ -492,7 +514,8 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  widget.restaurantData['whatsGoodHere'],
+                  widget.restaurantData['whatsGoodHere']?.toString() ??
+                      'Chef specials and seasonal favorites',
                   style: TextStyle(
                     color: Colors.grey[300],
                     fontSize: 14,
@@ -507,7 +530,36 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
   }
 
   Widget _buildGalleryTab() {
-    final gallery = widget.restaurantData['gallery'] as List;
+    final rawGallery = widget.restaurantData['galleryUrls'] ??
+        widget.restaurantData['gallery'];
+    final gallery = (rawGallery is List)
+        ? rawGallery.map((e) => e.toString()).toList()
+        : <String>[];
+
+    if (gallery.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.grey[900],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Center(
+            child: Column(
+              children: [
+                Icon(Icons.photo_library_outlined, color: Colors.grey, size: 40),
+                SizedBox(height: 12),
+                Text(
+                  'No gallery photos available yet',
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -521,14 +573,15 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
         ),
         itemCount: gallery.length,
         itemBuilder: (context, index) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              gallery[index],
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) => Container(
-                color: Colors.grey[800],
-                child: const Icon(Icons.image, color: Colors.white54),
+          final imgUrl = gallery[index];
+          return GestureDetector(
+            onTap: () => _openFullScreenGallery(gallery, index),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: DistrictCachedImage(
+                imageUrl: imgUrl,
+                fallbackAsset: 'assets/images/food.jpg',
+                fit: BoxFit.cover,
               ),
             ),
           );
@@ -920,34 +973,159 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
   }
 
   void _showGallery() {
-    final gallery = (widget.restaurantData['galleryUrls'] ??
-        widget.restaurantData['gallery'] ??
-        []) as List;
+    final rawGallery = widget.restaurantData['galleryUrls'] ??
+        widget.restaurantData['gallery'];
+    final gallery = (rawGallery is List)
+        ? rawGallery.map((e) => e.toString()).toList()
+        : <String>[];
 
     if (gallery.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No gallery photos available.')),
+        const SnackBar(
+          backgroundColor: Color(0xFF1E1E28),
+          content: Text('No gallery photos available for this venue.'),
+        ),
       );
       return;
     }
 
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.black,
-        child: SizedBox(
-          height: 400,
-          child: PageView.builder(
-            itemCount: gallery.length,
+    _openFullScreenGallery(gallery, 0);
+  }
+
+  void _openFullScreenGallery(List<String> photos, int initialIndex) {
+    final name = widget.restaurantData['name'] ??
+        widget.restaurantData['title'] ??
+        'Gallery';
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => _FullScreenGalleryViewer(
+          photos: photos,
+          initialIndex: initialIndex,
+          restaurantName: name.toString(),
+        ),
+      ),
+    );
+  }
+}
+
+class _FullScreenGalleryViewer extends StatefulWidget {
+  final List<String> photos;
+  final int initialIndex;
+  final String restaurantName;
+
+  const _FullScreenGalleryViewer({
+    Key? key,
+    required this.photos,
+    required this.initialIndex,
+    required this.restaurantName,
+  }) : super(key: key);
+
+  @override
+  State<_FullScreenGalleryViewer> createState() =>
+      _FullScreenGalleryViewerState();
+}
+
+class _FullScreenGalleryViewerState extends State<_FullScreenGalleryViewer> {
+  late PageController _pageController;
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex;
+    _pageController = PageController(initialPage: widget.initialIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF09090E),
+      appBar: AppBar(
+        backgroundColor: Colors.black.withOpacity(0.8),
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.restaurantName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              '${_currentIndex + 1} of ${widget.photos.length}',
+              style: TextStyle(
+                color: Colors.grey.shade400,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            itemCount: widget.photos.length,
+            onPageChanged: (idx) {
+              setState(() => _currentIndex = idx);
+            },
             itemBuilder: (context, index) {
-              return DistrictCachedImage(
-                imageUrl: gallery[index].toString(),
-                fallbackAsset: 'assets/images/food.jpg',
-                fit: BoxFit.contain,
+              return InteractiveViewer(
+                minScale: 1.0,
+                maxScale: 3.5,
+                child: Center(
+                  child: DistrictCachedImage(
+                    imageUrl: widget.photos[index],
+                    fallbackAsset: 'assets/images/food.jpg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
               );
             },
           ),
-        ),
+
+          // Bottom indicator dots if multiple photos
+          if (widget.photos.length > 1)
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(widget.photos.length, (idx) {
+                  final isSelected = idx == _currentIndex;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: isSelected ? 20 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? const Color(0xFF6366F1)
+                          : Colors.grey.shade700,
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  );
+                }),
+              ),
+            ),
+        ],
       ),
     );
   }

@@ -102,40 +102,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       }
 
-      // ✅ Get current location
-      loc.LocationData myLocation = await location.getLocation();
-      double lat = myLocation.latitude!;
-      double lon = myLocation.longitude!;
+      // ✅ Get current location with timeout to avoid blocking main thread
+      loc.LocationData myLocation = await location.getLocation().timeout(
+        const Duration(seconds: 4),
+        onTimeout: () => throw Exception('Location request timed out'),
+      );
+      double lat = myLocation.latitude ?? 28.5700;
+      double lon = myLocation.longitude ?? 77.3200;
 
       // ✅ Get full placemark info
-      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon).timeout(
+        const Duration(seconds: 4),
+        onTimeout: () => [],
+      );
 
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks.first;
 
         // Get clean city and area info
         String cityName =
-            place.locality ?? place.subAdministrativeArea ?? "Unknown";
+            place.locality ?? place.subAdministrativeArea ?? "Delhi NCR";
 
         // Combine plus code / name and administrative area
         String areaDetails = [
           if (place.name != null && place.name!.isNotEmpty)
-            place.name, // e.g., MGF3+QG6
+            place.name,
           if (place.subAdministrativeArea != null &&
               place.subAdministrativeArea!.isNotEmpty)
-            place.subAdministrativeArea, // e.g., Meerut Division
+            place.subAdministrativeArea,
         ].join(', ');
 
+        if (mounted) {
+          setState(() {
+            _city = cityName;
+            _country = areaDetails.isNotEmpty ? areaDetails : 'Delhi NCR';
+          });
+        }
+      }
+    } catch (_) {
+      if (mounted) {
         setState(() {
-          _city = cityName; // Ghaziabad
-          _country = areaDetails; // MGF3+QG6, Meerut Division
+          _city = "Delhi NCR";
+          _country = "Connaught Place";
         });
       }
-    } catch (e) {
-      setState(() {
-        _city = "Error";
-        _country = "";
-      });
     }
   }
 
