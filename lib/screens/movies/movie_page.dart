@@ -28,64 +28,62 @@ class MoviesPage extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildBannerImage('assets/images/spotlight_banner.png'),
-              if (movies.isNotEmpty) _buildMovieCarousel(context, movies),
-              const SizedBox(height: 20),
-              _buildBannerImage('assets/images/below-spotlight.png'),
-              const SizedBox(height: 20),
-              if (movies.isNotEmpty) _buildHorizontalMovieList(screenWidth, movies),
-              const SizedBox(height: 20),
-              _buildBannerImage('assets/images/explore_icon.png'),
-              const SizedBox(height: 20),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildBannerImage('assets/images/spotlight_banner.png'),
+            if (movies.isNotEmpty) _buildMovieCarousel(context, movies),
+            const SizedBox(height: 20),
+            _buildBannerImage('assets/images/below-spotlight.png'),
+            const SizedBox(height: 20),
+            if (movies.isNotEmpty) _buildHorizontalMovieList(screenWidth, movies),
+            const SizedBox(height: 20),
+            _buildBannerImage('assets/images/explore_icon.png'),
+            const SizedBox(height: 20),
 
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  _StaticImageBox(imagePath: 'assets/images/box_left.jpeg'),
+                  _StaticImageBox(imagePath: 'assets/images/box_right.jpeg'),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+            _buildBannerImage('assets/images/only_theatre.png'),
+            const SizedBox(height: 20),
+
+            if (movies.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
-                    _StaticImageBox(imagePath: 'assets/images/box_left.jpeg'),
-                    _StaticImageBox(imagePath: 'assets/images/box_right.jpeg'),
-                  ],
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final boxWidth = (constraints.maxWidth - 12) / 2;
+                    return Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: List.generate(movies.length, (index) {
+                        final movie = movies[index];
+                        return SizedBox(
+                          width: boxWidth,
+                          child: MovieBox(
+                            movieData: movie.toMap(),
+                            width: boxWidth,
+                          ),
+                        );
+                      }),
+                    );
+                  },
                 ),
               ),
 
-              const SizedBox(height: 20),
-              _buildBannerImage('assets/images/only_theatre.png'),
-              const SizedBox(height: 20),
-
-              if (movies.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final boxWidth = (constraints.maxWidth - 12) / 2;
-                      return Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: List.generate(movies.length, (index) {
-                          final movie = movies[index];
-                          return SizedBox(
-                            width: boxWidth,
-                            child: MovieBox(
-                              movieData: movie.toMap(),
-                              width: boxWidth,
-                            ),
-                          );
-                        }),
-                      );
-                    },
-                  ),
-                ),
-
-              const SizedBox(height: 40),
-            ],
-          ),
+            const SizedBox(height: 40),
+          ],
         ),
       ),
     );
