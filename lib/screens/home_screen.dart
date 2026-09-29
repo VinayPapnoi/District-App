@@ -7,10 +7,8 @@ import '../providers/content_provider.dart';
 import '../utils/colors.dart';
 import 'sub_screens/activities_page.dart';
 import 'sub_screens/dining_page.dart';
-import 'sub_screens/events_page.dart';
 import 'sub_screens/for_you_page.dart';
 import 'movies/movie_page.dart';
-import 'sub_screens/stores_page.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,36 +27,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final List<String> _tabs = [
     'FOR YOU',
     'DINING',
-    'EVENTS',
     'MOVIES',
-    'STORES',
     'ACTIVITIES',
   ];
 
   final List<Color> _tabColors = [
     AppColors.forYouPurple,
     AppColors.diningRed,
-    AppColors.eventsYellow,
     AppColors.moviesBlue,
-    AppColors.storesGreen,
     AppColors.activitiesOrange,
   ];
 
   final List<Widget> _pages = [
     ForYouPage(),
     DiningPage(),
-    EventsPage(),
     MoviesPage(),
-    StoresPage(),
     ActivitiesPage(),
   ];
 
   final List<String> _searchHints = [
     'Search for events, movies, restaurants...',
     'Search for restaurants, cuisines, dishes...',
-    'Search for concerts, shows, exhibitions...',
     'Search for movies, showtimes, theaters...',
-    'Search for products, brands, stores...',
     'Search for activities, experiences, fun...',
   ];
 
@@ -324,9 +314,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       final List<IconData> icons = [
                         Icons.auto_awesome,
                         Icons.restaurant,
-                        Icons.festival_outlined,
                         Icons.movie_creation_outlined,
-                        Icons.shopping_bag_outlined,
                         Icons.local_activity_outlined,
                       ];
 
