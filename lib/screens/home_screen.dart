@@ -180,8 +180,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     center: Alignment.topCenter,
                     radius: 1.2,
                     colors: [
-                      _tabColors[_selectedTabIndex].withOpacity(0.4),
-                      _tabColors[_selectedTabIndex].withOpacity(0.2),
+                      _tabColors[_selectedTabIndex].withValues(alpha: 0.4),
+                      _tabColors[_selectedTabIndex].withValues(alpha: 0.2),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.5, 1.0],
@@ -253,35 +253,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           size: 20,
                                         ),
                                         const SizedBox(width: 4),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  _city,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
+                                                      _city,
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                                const Icon(
-                                                  Icons.keyboard_arrow_down,
-                                                  color: Colors.white,
-                                                  size: 20,
-                                                ),
-                                              ],
-                                            ),
-                                            Text(
-                                              _country,
-                                              style: const TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 12,
+                                                  const Icon(
+                                                    Icons.keyboard_arrow_down,
+                                                    color: Colors.white,
+                                                    size: 20,
+                                                  ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
+                                              Text(
+                                                _country,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -401,27 +410,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                           children: [
                                             Icon(
                                               icons[index],
-                                              size: screenWidth * 0.08,
+                                              size: (screenWidth * 0.065).clamp(20.0, 28.0),
                                               color: isSelected
                                                   ? _tabColors[index]
                                                   : Colors.grey,
                                             ),
-                                            SizedBox(height: screenHeight * 0.01),
+                                            const SizedBox(height: 4),
                                             Text(
                                               _tabs[index],
                                               style: TextStyle(
                                                 color: isSelected
                                                     ? _tabColors[index]
                                                     : Colors.grey.shade400,
-                                                fontSize: screenWidth * 0.03,
+                                                fontSize: (screenWidth * 0.028).clamp(10.0, 13.0),
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
-                                            SizedBox(height: screenHeight * 0.005),
+                                            const SizedBox(height: 4),
                                             Container(
                                               height: 2,
-                                              width: screenWidth * 0.08,
+                                              width: (screenWidth * 0.08).clamp(22.0, 36.0),
                                               color: isSelected
                                                   ? _tabColors[index]
                                                   : Colors.transparent,

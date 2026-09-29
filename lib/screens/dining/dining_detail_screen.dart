@@ -228,11 +228,15 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                           Icon(Icons.access_time,
                               color: Colors.grey[400], size: 16),
                           const SizedBox(width: 4),
-                          Text(
-                            widget.restaurantData['timings']?.toString() ?? 'Open • Timings vary',
-                            style: TextStyle(
-                              color: Colors.grey[400],
-                              fontSize: 14,
+                          Expanded(
+                            child: Text(
+                              widget.restaurantData['timings']?.toString() ?? 'Open • Timings vary',
+                              style: TextStyle(
+                                color: Colors.grey[400],
+                                fontSize: 14,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
@@ -249,17 +253,25 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildQuickInfo(
-                        icon: Icons.location_on,
-                        label: widget.restaurantData['distance']?.toString() ?? 'Nearby',
+                      Expanded(
+                        child: _buildQuickInfo(
+                          icon: Icons.location_on,
+                          label: widget.restaurantData['distance']?.toString() ?? 'Nearby',
+                        ),
                       ),
-                      _buildQuickInfo(
-                        icon: Icons.access_time,
-                        label: 'What\'s good here?',
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickInfo(
+                          icon: Icons.access_time,
+                          label: 'What\'s good here?',
+                        ),
                       ),
-                      _buildQuickInfo(
-                        icon: Icons.currency_rupee,
-                        label: widget.restaurantData['priceForTwo']?.toString() ?? '₹1,000 for two',
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildQuickInfo(
+                          icon: Icons.currency_rupee,
+                          label: widget.restaurantData['priceForTwo']?.toString() ?? '₹1,000 for two',
+                        ),
                       ),
                     ],
                   ),
@@ -301,14 +313,19 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
 
   Widget _buildQuickInfo({required IconData icon, required String label}) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, color: Colors.grey[400], size: 20),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[400],
-            fontSize: 12,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
           ),
         ),
       ],
@@ -628,61 +645,72 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
 
   Widget _buildBottomButtons() {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[900],
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () => _showTableBookingSheet(context),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.white),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => _showTableBookingSheet(context),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.white),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Book a table',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              child: const Text(
-                'Book a table',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () => _showPayBillSheet(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'Pay bill',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ElevatedButton(
-              onPressed: () => _showPayBillSheet(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                'Pay bill',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -704,41 +732,44 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheetState) {
-          return Container(
-            padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Color(0xFF13131A),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade700,
-                      borderRadius: BorderRadius.circular(2),
+          return SafeArea(
+            top: false,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Color(0xFF13131A),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade700,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Reserve a Table at ${widget.restaurantData['name'] ?? 'Restaurant'}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.restaurantData['location'] ?? '',
-                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
-                ),
-                const SizedBox(height: 20),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Reserve a Table at ${widget.restaurantData['name'] ?? 'Restaurant'}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.restaurantData['location'] ?? '',
+                      style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                    ),
+                    const SizedBox(height: 20),
 
                 // Number of guests
                 Row(
@@ -868,11 +899,13 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
                 const SizedBox(height: 16),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        ),
+      );
+    },
+  ),
+);
+}
 
   void _showPayBillSheet(BuildContext context) {
     final TextEditingController amountController =
@@ -882,90 +915,98 @@ class _DiningDetailScreenState extends State<DiningDetailScreen>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: Color(0xFF13131A),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade700,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Pay Dining Bill at ${widget.restaurantData['name'] ?? ''}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white, fontSize: 18),
-                decoration: InputDecoration(
-                  prefixText: '₹ ',
-                  prefixStyle: const TextStyle(color: Color(0xFF10B981), fontSize: 18),
-                  labelText: 'Enter Bill Amount',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: const Color(0xFF22222E),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: const Color(0xFF10B981),
-                        content: Text(
-                          '✅ Bill payment of ₹${amountController.text} processed successfully with 10% instant discount applied!',
-                        ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: const BoxDecoration(
+              color: Color(0xFF13131A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade700,
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    'Proceed to Pay with Discount',
-                    style: TextStyle(
-                      color: Colors.black,
+                  const SizedBox(height: 16),
+                  Text(
+                    'Pay Dining Bill at ${widget.restaurantData['name'] ?? ''}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: amountController,
+                    keyboardType: TextInputType.number,
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                    decoration: InputDecoration(
+                      prefixText: '₹ ',
+                      prefixStyle: const TextStyle(color: Color(0xFF10B981), fontSize: 18),
+                      labelText: 'Enter Bill Amount',
+                      labelStyle: const TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: const Color(0xFF22222E),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: const Color(0xFF10B981),
+                            content: Text(
+                              '✅ Bill payment of ₹${amountController.text} processed successfully with 10% instant discount applied!',
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'Proceed to Pay with Discount',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
       ),

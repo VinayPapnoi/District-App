@@ -185,29 +185,32 @@ class _DiningPageState extends ConsumerState<DiningPage> {
   }
 
   Widget _buildTopRatedCarousel(List<Restaurant> restaurants) {
-    return SizedBox(
-      height: 220,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        physics: const BouncingScrollPhysics(),
-        itemCount: restaurants.length,
-        itemBuilder: (context, index) {
-          final restaurant = restaurants[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DiningDetailScreen(
-                    restaurantData: restaurant.toMap(),
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              width: 260,
-              margin: const EdgeInsets.only(right: 14),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = (constraints.maxWidth * 0.72).clamp(220.0, 280.0);
+        return SizedBox(
+          height: 220,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            physics: const BouncingScrollPhysics(),
+            itemCount: restaurants.length,
+            itemBuilder: (context, index) {
+              final restaurant = restaurants[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => DiningDetailScreen(
+                        restaurantData: restaurant.toMap(),
+                      ),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: cardWidth,
+                  margin: const EdgeInsets.only(right: 14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 color: const Color(0xFF18181E),
@@ -297,7 +300,9 @@ class _DiningPageState extends ConsumerState<DiningPage> {
         },
       ),
     );
-  }
+  },
+);
+}
 
   Widget _buildRestaurantCard(Restaurant restaurant) {
     return GestureDetector(
@@ -418,10 +423,10 @@ class _DiningPageState extends ConsumerState<DiningPage> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEF4444).withOpacity(0.15),
+                        color: const Color(0xFFEF4444).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: const Color(0xFFEF4444).withOpacity(0.4),
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.4),
                         ),
                       ),
                       child: Text(

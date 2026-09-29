@@ -74,6 +74,7 @@ class MoviesPage extends ConsumerWidget {
                           child: MovieBox(
                             movieData: movie.toMap(),
                             width: boxWidth,
+                            margin: EdgeInsets.zero,
                           ),
                         );
                       }),
@@ -187,8 +188,9 @@ class MoviesPage extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         itemBuilder: (context, index) {
           final movie = movies[index];
+          final cardWidth = (screenWidth * 0.38).clamp(130.0, 180.0);
           return Container(
-            width: screenWidth * 0.35,
+            width: cardWidth,
             margin: const EdgeInsets.symmetric(horizontal: 8),
             decoration: BoxDecoration(
               color: Colors.grey[900],
@@ -205,28 +207,29 @@ class MoviesPage extends ConsumerWidget {
               },
               child: Column(
                 children: [
-                  ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(12)),
-                    child: SizedBox(
-                      height: 180,
-                      width: double.infinity,
-                      child: DistrictCachedImage(
-                        imageUrl: movie.bannerUrl,
-                        fallbackAsset: 'assets/movieimg/movies/oppenheimer.jpg',
-                        fit: BoxFit.cover,
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(12)),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: DistrictCachedImage(
+                          imageUrl: movie.bannerUrl,
+                          fallbackAsset: 'assets/movieimg/movies/oppenheimer.jpg',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
                     child: Text(
                       movie.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -328,6 +331,7 @@ class MoviesPage extends ConsumerWidget {
                   return MovieBox(
                     movieData: movie.toMap(),
                     width: boxWidth,
+                    margin: EdgeInsets.zero,
                   );
                 }).toList(),
               );

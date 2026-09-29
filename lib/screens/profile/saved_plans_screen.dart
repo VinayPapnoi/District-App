@@ -46,20 +46,25 @@ class _SavedPlansScreenState extends ConsumerState<SavedPlansScreen>
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'My Saved Plans',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            const Flexible(
+              child: Text(
+                'My Saved Plans',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withOpacity(0.2),
+                color: const Color(0xFFF59E0B).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -78,6 +83,8 @@ class _SavedPlansScreenState extends ConsumerState<SavedPlansScreen>
           indicatorColor: const Color(0xFF6366F1),
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
           labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
           tabs: [
             Tab(text: 'Movies (${favMovies.length})'),

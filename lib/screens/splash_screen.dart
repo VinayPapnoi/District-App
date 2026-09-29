@@ -22,12 +22,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final logoWidth = (size.width * 0.55).clamp(160.0, 250.0);
+
     return Scaffold(
       backgroundColor: AppColors.primaryPurple,
       body: Center(
         child: Image.asset(
           'assets/images/district_logo.png',
-          width: 250,
+          width: logoWidth,
         ),
       ),
     );

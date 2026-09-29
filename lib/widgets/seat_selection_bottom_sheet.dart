@@ -70,14 +70,17 @@ class _SeatSelectionBottomSheetState
       });
     }
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: Color(0xFF13131A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.sizeOf(context).height * 0.90,
       ),
-      child: Column(
-        children: [
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF13131A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
           // Drag handle
           Center(
             child: Container(
@@ -193,7 +196,7 @@ class _SeatSelectionBottomSheetState
                           borderRadius: BorderRadius.circular(2),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF6366F1).withOpacity(0.5),
+                              color: const Color(0xFF6366F1).withValues(alpha: 0.5),
                               blurRadius: 10,
                               spreadRadius: 2,
                             ),
@@ -220,13 +223,13 @@ class _SeatSelectionBottomSheetState
                   const SizedBox(height: 24),
 
                   // Legend
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 16,
+                    runSpacing: 8,
                     children: [
                       _buildLegendItem('Available', const Color(0xFF22222E)),
-                      const SizedBox(width: 16),
                       _buildLegendItem('Selected', const Color(0xFF6366F1)),
-                      const SizedBox(width: 16),
                       _buildLegendItem('Booked', const Color(0xFFDC2626)),
                     ],
                   ),
@@ -238,84 +241,95 @@ class _SeatSelectionBottomSheetState
           ),
 
           // Bottom summary bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Color(0xFF1A1A24),
-              border: Border(top: BorderSide(color: Color(0xFF262636))),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _selectedSeats.isEmpty
-                            ? 'Select seats'
-                            : 'Seats: ${_selectedSeats.join(', ')}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '₹$totalPrice (${_selectedSeats.length} tickets)',
-                        style: const TextStyle(
-                          color: Color(0xFF10B981),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: (_selectedSeats.isEmpty || _isBooking)
-                        ? null
-                        : () => _handleBooking(effectiveBookedSeats),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFEF4444),
-                      disabledBackgroundColor: Colors.grey.shade800,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                    ),
-                    child: _isBooking
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : const Text(
-                            'Confirm & Pay',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            ),
+          SafeArea(
+            top: false,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                color: Color(0xFF1A1A24),
+                border: Border(top: BorderSide(color: Color(0xFF262636))),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _selectedSeats.isEmpty
+                              ? 'Select seats'
+                              : 'Seats: ${_selectedSeats.join(', ')}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '₹$totalPrice (${_selectedSeats.length} tickets)',
+                          style: const TextStyle(
+                            color: Color(0xFF10B981),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 8),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: (_selectedSeats.isEmpty || _isBooking)
+                          ? null
+                          : () => _handleBooking(effectiveBookedSeats),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEF4444),
+                        disabledBackgroundColor: Colors.grey.shade800,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                      child: _isBooking
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : const Text(
+                              'Confirm & Pay',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildSeatGrid(Set<String> effectiveBookedSeats) {
-    return Column(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
       children: _rows.map((row) {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
@@ -406,8 +420,11 @@ class _SeatSelectionBottomSheetState
           ),
         );
       }).toList(),
-    );
-  }
+    ),
+  );
+},
+);
+}
 
   Widget _buildLegendItem(String label, Color color) {
     return Row(
@@ -568,12 +585,16 @@ class _SeatSelectionBottomSheetState
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],

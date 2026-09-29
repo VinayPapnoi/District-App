@@ -519,159 +519,177 @@ class _ActivityBookingSheetState extends ConsumerState<_ActivityBookingSheet> {
   Widget build(BuildContext context) {
     final total = _playersCount * widget.activity.pricePerPerson;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF12121A),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Drag handle
-          Center(
-            child: Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade700,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          Text(
-            widget.activity.title,
-            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${widget.activity.location} • ₹${widget.activity.pricePerPerson}/player',
-            style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
-          ),
-          const SizedBox(height: 18),
-
-          // Date Selector
-          const Text('Select Date', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _days.map((day) {
-                final isSelected = _selectedDay == day;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(day, style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade400, fontSize: 12)),
-                    selected: isSelected,
-                    selectedColor: const Color(0xFF6366F1),
-                    backgroundColor: const Color(0xFF1E1E2A),
-                    onSelected: (val) {
-                      if (val) setState(() => _selectedDay = day);
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Time Slot Selector
-          const Text('Select Time Slot', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _timeSlots.map((time) {
-                final isSelected = _selectedTime == time;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(time, style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade400, fontSize: 12)),
-                    selected: isSelected,
-                    selectedColor: const Color(0xFF6366F1),
-                    backgroundColor: const Color(0xFF1E1E2A),
-                    onSelected: (val) {
-                      if (val) setState(() => _selectedTime = time);
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Players Count
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return SafeArea(
+      top: false,
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF12121A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Players / Guests', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E2A),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF262636)),
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade700,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
+              ),
+              const SizedBox(height: 16),
+
+              Text(
+                widget.activity.title,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${widget.activity.location} • ₹${widget.activity.pricePerPerson}/player',
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+              ),
+              const SizedBox(height: 18),
+
+              // Date Selector
+              const Text('Select Date', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove, color: Colors.white, size: 18),
-                      onPressed: _playersCount > 1 ? () => setState(() => _playersCount--) : null,
-                    ),
-                    Text(
-                      '$_playersCount',
-                      style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add, color: Colors.white, size: 18),
-                      onPressed: _playersCount < 8 ? () => setState(() => _playersCount++) : null,
-                    ),
-                  ],
+                  children: _days.map((day) {
+                    final isSelected = _selectedDay == day;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(day, style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade400, fontSize: 12)),
+                        selected: isSelected,
+                        selectedColor: const Color(0xFF6366F1),
+                        backgroundColor: const Color(0xFF1E1E2A),
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedDay = day);
+                        },
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
-            ],
-          ),
 
-          const SizedBox(height: 20),
-          const Divider(color: Color(0xFF262636)),
-          const SizedBox(height: 10),
+              const SizedBox(height: 16),
 
-          // Confirmation Bar
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // Time Slot Selector
+              const Text('Select Time Slot', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _timeSlots.map((time) {
+                    final isSelected = _selectedTime == time;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(time, style: TextStyle(color: isSelected ? Colors.white : Colors.grey.shade400, fontSize: 12)),
+                        selected: isSelected,
+                        selectedColor: const Color(0xFF6366F1),
+                        backgroundColor: const Color(0xFF1E1E2A),
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedTime = time);
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Players Count
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Total Amount', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                  Text(
-                    '₹$total',
-                    style: const TextStyle(color: Color(0xFF10B981), fontSize: 20, fontWeight: FontWeight.bold),
+                  const Flexible(
+                    child: Text('Players / Guests', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E1E2A),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFF262636)),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove, color: Colors.white, size: 18),
+                          onPressed: _playersCount > 1 ? () => setState(() => _playersCount--) : null,
+                        ),
+                        Text(
+                          '$_playersCount',
+                          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add, color: Colors.white, size: 18),
+                          onPressed: _playersCount < 8 ? () => setState(() => _playersCount++) : null,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              SizedBox(
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _isSaving ? null : _confirmBooking,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
+
+              const SizedBox(height: 20),
+              const Divider(color: Color(0xFF262636)),
+              const SizedBox(height: 10),
+
+              // Confirmation Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Total Amount', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            '₹$total',
+                            style: const TextStyle(color: Color(0xFF10B981), fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: _isSaving
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Confirm & Book', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-                ),
+                  const SizedBox(width: 12),
+                  Flexible(
+                    child: SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: _isSaving ? null : _confirmBooking,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6366F1),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        ),
+                        child: _isSaving
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            : const FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text('Confirm & Book', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 16),
             ],
           ),
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }

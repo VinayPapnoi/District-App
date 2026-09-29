@@ -354,8 +354,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(right: 12),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
+                    horizontal: 16,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: isSelected
@@ -371,20 +371,26 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        date['date'] ?? '',
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.grey[400],
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          date['date'] ?? '',
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.grey[400],
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        date['day'] ?? '',
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.grey[500],
-                          fontSize: 12,
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          date['day'] ?? '',
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : Colors.grey[500],
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ],
@@ -438,180 +444,197 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           final int multiplier = ticketType == 'VIP Access' ? 2 : 1;
           final int total = ticketCount * pricePerTicket * multiplier;
 
-          return Container(
-            padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Color(0xFF13131A),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade700,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  widget.eventData['title'] ?? 'Event Booking',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  widget.eventData['venue'] ?? '',
-                  style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
-                ),
-                const SizedBox(height: 20),
-
-                // Pass Type
-                const Text(
-                  'Select Pass Type',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: ['General Entry', 'VIP Access'].map((type) {
-                    final isSel = ticketType == type;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: ChoiceChip(
-                        label: Text(type),
-                        selected: isSel,
-                        selectedColor: const Color(0xFF6366F1),
-                        backgroundColor: const Color(0xFF22222E),
-                        labelStyle: TextStyle(
-                          color: isSel ? Colors.white : Colors.grey.shade400,
-                        ),
-                        onSelected: (val) {
-                          if (val) setSheetState(() => ticketType = type);
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Quantity selector
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          return SafeArea(
+            top: false,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Color(0xFF13131A),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade700,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      widget.eventData['title'] ?? 'Event Booking',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      widget.eventData['venue'] ?? '',
+                      style: TextStyle(color: Colors.grey.shade400, fontSize: 12),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Pass Type
                     const Text(
-                      'Number of Passes',
+                      'Select Pass Type',
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline, color: Colors.white70),
-                          onPressed: ticketCount > 1
-                              ? () => setSheetState(() => ticketCount--)
-                              : null,
-                        ),
-                        Text(
-                          '$ticketCount',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 8,
+                      children: ['General Entry', 'VIP Access'].map((type) {
+                        final isSel = ticketType == type;
+                        return ChoiceChip(
+                          label: Text(type),
+                          selected: isSel,
+                          selectedColor: const Color(0xFF6366F1),
+                          backgroundColor: const Color(0xFF22222E),
+                          labelStyle: TextStyle(
+                            color: isSel ? Colors.white : Colors.grey.shade400,
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline, color: Colors.white70),
-                          onPressed: ticketCount < 10
-                              ? () => setSheetState(() => ticketCount++)
-                              : null,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const Divider(color: Color(0xFF262636)),
-                const SizedBox(height: 12),
-
-                // Total and Pay
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Total Amount', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                        Text(
-                          '₹$total',
-                          style: const TextStyle(
-                            color: Color(0xFF10B981),
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(ctx);
-                        final refCode =
-                            'EVT-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
-
-                        final booking = Booking(
-                          id: 'booking_${DateTime.now().millisecondsSinceEpoch}',
-                          userId: 'guest_user',
-                          itemTitle:
-                              widget.eventData['title']?.toString() ?? 'Event',
-                          itemType: 'event',
-                          imageUrl: widget.eventData['imageUrl']?.toString() ??
-                              widget.eventData['image']?.toString() ??
-                              '',
-                          date:
-                              widget.eventData['dateTime']?.toString() ?? 'Upcoming',
-                          time: 'Evening',
-                          details: '$ticketType x $ticketCount',
-                          totalPrice: total,
-                          bookingReference: refCode,
-                          createdAt: DateTime.now(),
+                          onSelected: (val) {
+                            if (val) setSheetState(() => ticketType = type);
+                          },
                         );
+                      }).toList(),
+                    ),
 
-                        await ContentRepository().saveBooking(booking);
+                    const SizedBox(height: 20),
 
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: const Color(0xFF10B981),
-                              content: Text(
-                                '🎉 $ticketCount passes confirmed! Booking Ref: $refCode',
+                    // Quantity selector
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Flexible(
+                          child: Text(
+                            'Number of Passes',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline, color: Colors.white70),
+                              onPressed: ticketCount > 1
+                                  ? () => setSheetState(() => ticketCount--)
+                                  : null,
+                            ),
+                            Text(
+                              '$ticketCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline, color: Colors.white70),
+                              onPressed: ticketCount < 10
+                                  ? () => setSheetState(() => ticketCount++)
+                                  : null,
+                            ),
+                          ],
                         ),
-                      ),
-                      child: const Text(
-                        'Confirm Booking',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
+                      ],
                     ),
+
+                    const Divider(color: Color(0xFF262636)),
+                    const SizedBox(height: 12),
+
+                    // Total and Pay
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Total Amount', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  '₹$total',
+                                  style: const TextStyle(
+                                    color: Color(0xFF10B981),
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              Navigator.pop(ctx);
+                              final refCode =
+                                  'EVT-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+
+                              final booking = Booking(
+                                id: 'booking_${DateTime.now().millisecondsSinceEpoch}',
+                                userId: 'guest_user',
+                                itemTitle:
+                                    widget.eventData['title']?.toString() ?? 'Event',
+                                itemType: 'event',
+                                imageUrl: widget.eventData['imageUrl']?.toString() ??
+                                    widget.eventData['image']?.toString() ??
+                                    '',
+                                date:
+                                    widget.eventData['dateTime']?.toString() ?? 'Upcoming',
+                                time: 'Evening',
+                                details: '$ticketType x $ticketCount',
+                                totalPrice: total,
+                                bookingReference: refCode,
+                                createdAt: DateTime.now(),
+                              );
+
+                              await ContentRepository().saveBooking(booking);
+
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: const Color(0xFF10B981),
+                                    content: Text(
+                                      '🎉 $ticketCount passes confirmed! Booking Ref: $refCode',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6366F1),
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Confirm Booking',
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
-                const SizedBox(height: 16),
-              ],
+              ),
             ),
           );
         },

@@ -299,9 +299,9 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: color.withOpacity(0.5)),
+            border: Border.all(color: color.withValues(alpha: 0.5)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -374,12 +374,12 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.purple.withOpacity(0.3),
-            Colors.blue.withOpacity(0.2),
+            Colors.purple.withValues(alpha: 0.3),
+            Colors.blue.withValues(alpha: 0.2),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.purple.withOpacity(0.5)),
+        border: Border.all(color: Colors.purple.withValues(alpha: 0.5)),
       ),
       child: Row(
         children: [
@@ -487,20 +487,26 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          date['date'] ?? '',
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.grey[400],
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            date['date'] ?? '',
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.grey[400],
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 4),
-                        Text(
-                          date['day'] ?? '',
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.grey[500],
-                            fontSize: 12,
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            date['day'] ?? '',
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : Colors.grey[500],
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ],
@@ -556,7 +562,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 isBlockbusterOfferEnabled = value;
               });
             },
-            activeColor: const Color(0xFF6366F1),
+            activeThumbColor: const Color(0xFF6366F1),
           ),
         ],
       ),

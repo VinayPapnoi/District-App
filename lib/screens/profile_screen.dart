@@ -324,24 +324,31 @@ class ProfileScreen extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(
-                  icon,
-                  color: Colors.grey.shade400,
-                  size: 22,
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
+            Expanded(
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: Colors.grey.shade400,
+                    size: 22,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 8),
             Icon(
               Icons.chevron_right,
               color: Colors.grey.shade600,
@@ -358,39 +365,43 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
-          color: Color(0xFF12121A),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      builder: (ctx) => ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.85,
         ),
-        padding: const EdgeInsets.all(24),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade700,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Row(
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFF12121A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade700,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
-                    child: const Icon(Icons.hub_outlined, color: Color(0xFF818CF8), size: 26),
                   ),
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.hub_outlined, color: Color(0xFF818CF8), size: 26),
+                      ),
                   const SizedBox(width: 14),
                   const Expanded(
                     child: Column(
@@ -436,7 +447,9 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 
   Widget _buildArchBadge(String title, String description) {
@@ -464,66 +477,72 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: const BoxDecoration(
-          color: Color(0xFF12121A),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      builder: (ctx) => ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.85,
         ),
-        padding: const EdgeInsets.all(24),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade700,
-                    borderRadius: BorderRadius.circular(2),
+        child: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Color(0xFF12121A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            padding: const EdgeInsets.all(24),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade700,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              const Text(
-                'Frequently Asked Questions',
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 6),
-              Text('Answers to common queries about District plans', style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
-              const SizedBox(height: 18),
-              _buildFAQTile(
-                'How does real-time cinema seat booking work?',
-                'When you pick seats and tap Confirm & Pay, an atomic Firestore transaction locks the seats under the movie document. If another user attempts to book the same seats, the transaction rejects it and turns the seats Red (#DC2626) in real time.',
-              ),
-              _buildFAQTile(
-                'Can I view my tickets while offline?',
-                'Yes! District enables local Firestore persistence and caches ticket passes on disk. Previously loaded tickets in "My Bookings" remain accessible even without an internet connection.',
-              ),
-              _buildFAQTile(
-                'How do I save plans for later?',
-                'Tap the bookmark icon on any movie, restaurant, event, or activity card. Your saved plans are stored locally via SharedPreferences and can be viewed anytime in "My Saved Plans".',
-              ),
-              _buildFAQTile(
-                'How do table reservations and activities work?',
-                'Choose your preferred time slot and party size in the Dining or Activities tab. Your booking is recorded instantly to your account with a unique booking reference code (e.g. DST-ACT-XXXX).',
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 18),
+                  const Text(
+                    'Frequently Asked Questions',
+                    style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  child: const Text('Done', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                ),
+                  const SizedBox(height: 6),
+                  Text('Answers to common queries about District plans', style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+                  const SizedBox(height: 18),
+                  _buildFAQTile(
+                    'How does real-time cinema seat booking work?',
+                    'When you pick seats and tap Confirm & Pay, an atomic Firestore transaction locks the seats under the movie document. If another user attempts to book the same seats, the transaction rejects it and turns the seats Red (#DC2626) in real time.',
+                  ),
+                  _buildFAQTile(
+                    'Can I view my tickets while offline?',
+                    'Yes! District enables local Firestore persistence and caches ticket passes on disk. Previously loaded tickets in "My Bookings" remain accessible even without an internet connection.',
+                  ),
+                  _buildFAQTile(
+                    'How do I save plans for later?',
+                    'Tap the bookmark icon on any movie, restaurant, event, or activity card. Your saved plans are stored locally via SharedPreferences and can be viewed anytime in "My Saved Plans".',
+                  ),
+                  _buildFAQTile(
+                    'How do table reservations and activities work?',
+                    'Choose your preferred time slot and party size in the Dining or Activities tab. Your booking is recorded instantly to your account with a unique booking reference code (e.g. DST-ACT-XXXX).',
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6366F1),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text('Done', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

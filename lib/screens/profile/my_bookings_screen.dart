@@ -165,7 +165,7 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
         border: Border.all(color: const Color(0xFF262638), width: 1.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -199,35 +199,41 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: badgeColor.withOpacity(0.18),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              booking.itemType.toUpperCase(),
-                              style: TextStyle(
-                                color: badgeColor,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.8,
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: badgeColor.withValues(alpha: 0.18),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                booking.itemType.toUpperCase(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: badgeColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.8,
+                                ),
                               ),
                             ),
                           ),
+                          const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 3,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.2),
+                              color: const Color(0xFF10B981).withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.check_circle, size: 12, color: Color(0xFF10B981)),
                                 SizedBox(width: 4),
@@ -327,30 +333,35 @@ class _MyBookingsScreenState extends ConsumerState<MyBookingsScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'BOOKING REF',
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 10,
-                        letterSpacing: 1.0,
-                        fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'BOOKING REF',
+                        style: TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 10,
+                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      booking.bookingReference,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'monospace',
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 2),
+                      Text(
+                        booking.bookingReference,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 if (booking.totalPrice > 0)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,

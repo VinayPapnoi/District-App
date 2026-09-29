@@ -7,11 +7,13 @@ import 'district_cached_image.dart';
 class MovieBox extends StatelessWidget {
   final Map<String, dynamic> movieData;
   final double? width;
+  final EdgeInsetsGeometry? margin;
 
   const MovieBox({
     Key? key,
     required this.movieData,
     this.width,
+    this.margin,
   }) : super(key: key);
 
   @override
@@ -29,8 +31,8 @@ class MovieBox extends StatelessWidget {
         );
       },
       child: Container(
-        width: width ?? 160,
-        margin: const EdgeInsets.all(8),
+        width: width,
+        margin: margin ?? const EdgeInsets.all(6),
         decoration: BoxDecoration(
           color: Colors.grey[900],
           borderRadius: BorderRadius.circular(12),

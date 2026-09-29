@@ -84,7 +84,9 @@ class ForYouPage extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final boxWidth = (constraints.maxWidth - 12) / 2;
+                    final crossAxisCount = (constraints.maxWidth / 160).floor().clamp(2, 5);
+                    final totalGaps = (crossAxisCount - 1) * 12.0;
+                    final boxWidth = (constraints.maxWidth - totalGaps) / crossAxisCount;
                     return Wrap(
                       spacing: 12,
                       runSpacing: 12,
@@ -95,6 +97,7 @@ class ForYouPage extends ConsumerWidget {
                           child: MovieBox(
                             movieData: movie.toMap(),
                             width: boxWidth,
+                            margin: EdgeInsets.zero,
                           ),
                         );
                       }),
@@ -111,11 +114,13 @@ class ForYouPage extends ConsumerWidget {
   }
 
   Widget _buildSpotlightCarousel(BuildContext context, List<EventModel> events) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final carouselHeight = (screenHeight * 0.48).clamp(320.0, 460.0);
     final controller = PageController(viewportFraction: 0.85, initialPage: 1000);
     final total = events.length;
 
     return SizedBox(
-      height: 450,
+      height: carouselHeight,
       child: PageView.builder(
         controller: controller,
         itemBuilder: (context, index) {
@@ -144,7 +149,7 @@ class ForYouPage extends ConsumerWidget {
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.7),
+                            Colors.black.withValues(alpha: 0.7),
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
@@ -187,11 +192,13 @@ class ForYouPage extends ConsumerWidget {
   }
 
   Widget _buildMovieCarousel(BuildContext context, List<Movie> movies) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final carouselHeight = (screenHeight * 0.32).clamp(220.0, 300.0);
     final controller = PageController(viewportFraction: 0.7);
     final total = movies.length;
 
     return SizedBox(
-      height: 280,
+      height: carouselHeight,
       child: PageView.builder(
         controller: controller,
         itemBuilder: (context, index) {
@@ -219,7 +226,7 @@ class ForYouPage extends ConsumerWidget {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            Colors.black.withOpacity(0.7),
+                            Colors.black.withValues(alpha: 0.7),
                             Colors.transparent,
                           ],
                           begin: Alignment.bottomCenter,
@@ -254,11 +261,13 @@ class ForYouPage extends ConsumerWidget {
   }
 
   Widget _buildDiningCarousel(BuildContext context, List<Restaurant> restaurants) {
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final carouselHeight = (screenHeight * 0.36).clamp(240.0, 340.0);
     final controller = PageController(viewportFraction: 0.75, initialPage: 1000);
     final total = restaurants.length;
 
     return SizedBox(
-      height: 320,
+      height: carouselHeight,
       child: PageView.builder(
         controller: controller,
         itemBuilder: (context, index) {
@@ -287,7 +296,7 @@ class ForYouPage extends ConsumerWidget {
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            Colors.black.withOpacity(0.85),
+                            Colors.black.withValues(alpha: 0.85),
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,

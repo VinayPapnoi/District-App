@@ -49,100 +49,110 @@ class LoginScreen extends ConsumerWidget {
             ),
           ),
           child: LayoutBuilder(
-            builder: (context, constraints) => SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    children: [
-                      // Skip button
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/home');
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 34, 33, 33),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        ),
-                        child: const Text(
-                          'Skip',
-                          style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+            builder: (context, constraints) {
+              final isShort = constraints.maxHeight < 680;
+              final illustrationWidth = (constraints.maxWidth * 0.85).clamp(220.0, 328.0);
+              final illustrationHeight = (illustrationWidth * (200.0 / 328.0)).clamp(130.0, 200.0);
+              final topSpacing = isShort ? 16.0 : (constraints.maxHeight * 0.05).clamp(16.0, 80.0);
 
-                  // Top section with logo and illustration
-                  Expanded(
-                    flex: 3,
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // District logo
-                        Image.asset(
-                          'assets/images/district_logo.png',
-                          width: 120,
-                        ),
-                        const SizedBox(height: 100),
-
-                        // Placeholder for 3D illustration
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(
-                              "assets/images/place.png",
-                              height: 200,
-                              width: 328,
-                              fit: BoxFit.cover,
+                        // Skip button
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(context, '/home');
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: const Color.fromARGB(255, 34, 33, 33),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              ),
+                              child: const Text(
+                                'Skip',
+                                style: TextStyle(
+                                  color: AppColors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+                        // Top section with logo and illustration
+                        Expanded(
+                          flex: 3,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // District logo
+                              Image.asset(
+                                'assets/images/district_logo.png',
+                                width: (constraints.maxWidth * 0.32).clamp(90.0, 120.0),
+                              ),
+                              SizedBox(height: topSpacing),
 
-                        // Tagline
-                        const Text(
-                          'One app for all your going out plans',
-                          style: TextStyle(
-                            color: AppColors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
+                              // Placeholder for 3D illustration
+                              Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    "assets/images/place.png",
+                                    height: illustrationHeight,
+                                    width: illustrationWidth,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(height: 16),
+
+                              // Tagline
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Text(
+                                  'One app for all your going out plans',
+                                  style: TextStyle(
+                                    color: AppColors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
-                  ),
 
-                  // Bottom section with login form
-                  Expanded(
-                    flex: 2,
-                    child: SingleChildScrollView(
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24.0),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 19, 18, 18),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Log in or sign up text
-                            const Text(
-                              'Log in or sign up',
-                              style: TextStyle(
+                        // Bottom section with login form
+                        Expanded(
+                          flex: 2,
+                          child: SingleChildScrollView(
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(24.0),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 19, 18, 18),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Log in or sign up text
+                                  const Text(
+                                    'Log in or sign up',
+                                    style: TextStyle(
                                 color: AppColors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.w600,
@@ -283,11 +293,12 @@ class LoginScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     ),
